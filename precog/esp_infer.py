@@ -51,22 +51,26 @@ def main(cfg):
 
     log.info("Beginning evaluation. Model: {}".format(ckpt))    
     count = 0
+
     while True:
         minibatch = dataset.get_minibatch(split=cfg.split, input_singleton=inference.training_input, is_training=False)
+        print(minibatch)
         if not cfg.main.compute_metrics:
             for t in inference.training_input.experts.tensors:
                 try: del minibatch[t]
                 except KeyError: pass
         if minibatch is None: break
+
         sessrun = functools.partial(sess.run, feed_dict=minibatch)
         try:
             # Run sampling and convert to numpy.
             sampled_output_np = inference.sampled_output.to_numpy(sessrun)
+
             if cfg.main.compute_metrics:
                 # Get experts in numpy version.
                 experts_np = inference.training_input.experts.to_numpy(sessrun)
                 # Compute and store metrics.
-                metrics_results = dict(zip(metrics.keys(), sessrun(list(metrics.values()))))            
+                metrics_results = dict(zip(metrics.keys(), sessrun(list(metrics.values()))))
                 for k, val in metrics_results.items(): all_metrics[k].append(val)
             else:
                 experts_np = None

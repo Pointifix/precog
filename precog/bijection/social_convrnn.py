@@ -147,10 +147,16 @@ class SocialConvRNN(esp_bijection.ESPJointTrajectoryBijectionMixin, interface.ES
         if len(self.batch_shape) == 2:
             # (B, K, A)
             yaws_batch = tensoru.expand_and_tile_axis(phi.yaws, axis=1, N=self.batch_shape[1])
+
+            print("------------------------ yaws_batch.shape")
+            print(phi.yaws.shape, yaws_batch.shape, self.batch_shape[1], (self.A_batch_size, 1))
             # (BKA, 1)
             self.yaws_A_batch = tf.reshape(yaws_batch, (self.A_batch_size, 1))
         elif len(self.batch_shape) == 1:
             # (BA, 1)
+            print("------------------------ phi.yaws.shape")
+            print(phi.yaws.shape)
+
             self.yaws_A_batch = tf.reshape(phi.yaws, (self.A_batch_size, 1))
         else: raise ValueError("Unhandled batch size")
             

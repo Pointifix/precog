@@ -250,7 +250,7 @@ class ESPPhi(NumpyableTensorGroup):
                  overhead_features,
                  agent_presence,
                  feature_pixels_per_meter,
-                 is_training,
+                 is_training=True,
                  light_strings=None,
                  yaws_in_degrees=True,
                  past_perturb_epsilon=5e-2,
@@ -333,7 +333,8 @@ class ESPPhi(NumpyableTensorGroup):
         if len(batch_shape) == 2: self.batch_str = 'bk'
         elif len(batch_shape) == 1: self.batch_str = 'b'
         else: raise ValueError("Unhandled batch size")
-        
+
+        print("BATCH SIZE", batch_shape)
         if len(batch_shape) == 1:            
             self.current_local2world = self.original_local2world = self.world2local.invert()
             # Input spaces: Car frames. Output space: grid frame.

@@ -72,11 +72,12 @@ class SimilarityTransform:
         points_R = self.scale * self.lib.einsum(einstr, self.R, points)
 
         # Add the translation.
-        if translate:
-            if self.tr == 1: points_Rt = points_R + self.t
-            else: points_Rt = points_R + self._ts[points_ein]
-        else:
-            points_Rt = points_R
+        # TODO commented out by Simon Pointner, enable again
+        #if translate:
+        #    if self.tr == 1: points_Rt = points_R + self.t
+        #    else: points_Rt = points_R + self._ts[points_ein]
+        #else:
+        points_Rt = points_R
 
         if dtype == self.lib.int32: return self.lib.cast(self.lib.round(points_Rt), self.lib.int32)
         else: return points_Rt

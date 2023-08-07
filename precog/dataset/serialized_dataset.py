@@ -108,32 +108,40 @@ class SerializedDataset(interface.ESPDataset, minibatched_dataset.MinibatchedDat
         k = lambda _, _k: getattr(_, self.keyremap[_k])
 
         data = self._fetch_minibatch(mb_idx, split)
-        
+
+        # Edited by Simon Pointner to also integrate other agents
         # (1, B, T, d)
-        player_experts = np.stack([np.asarray(k(_, 'player_future')) for _ in data], 0)[None]
+        futures = np.stack([np.asarray(k(_, 'player_future')) for _ in data], 0)[None]
+        player_experts = futures[:,[0],:,:]
 
         # (1, B, Tp, d)
-        player_pasts = np.stack([np.asarray(k(_, 'player_past')) for _ in data], 0)[None]
-        
+        pasts = np.stack([np.asarray(k(_, 'player_past')) for _ in data], 0)[None]
+        player_pasts = pasts[:,[0],:,:]
+
         # (1, B)
-        player_yaws = np.stack([k(_, 'player_yaw') for _ in data], 0)[None]
+        yaws = np.stack([k(_, 'player_yaw') for _ in data], 0)[None]
+        player_yaws = yaws[:,[0]]
 
         # (O, B, T, d)
         if self.Other_count > 0:
-            other_experts = np.stack([npu.fill_axis_to_size(
-                np.asarray(k(_, 'agent_futures'))[:self.Other_count], axis=0, size=self.Other_count) for _ in data], 1)
+            other_experts = futures[:,1:, :, :]
+
+            #other_experts = np.stack([npu.fill_axis_to_size(
+            #    np.asarray(k(_, 'agent_futures'))[:self.Other_count], axis=0, size=self.Other_count) for _ in data], 1)
             # (O, B, Tp, d)
-            other_pasts = np.stack([npu.fill_axis_to_size(
-                np.asarray(k(_, 'agent_pasts'))[:self.Other_count], axis=0, size=self.Other_count_past) for _ in data], 1)
+            other_pasts = pasts[:,1:, :, :]
+            #other_pasts = np.stack([npu.fill_axis_to_size(
+            #    np.asarray(k(_, 'agent_pasts'))[:self.Other_count], axis=0, size=self.Other_count_past) for _ in data], 1)
                 
             # (O, B)
-            other_yaws = np.stack([npu.fill_axis_to_size(
-                k(_, 'agent_yaws')[:self.Other_count], axis=0, size=self.Other_count) for _ in data], 1)
+            other_yaws = yaws[:,1:]
+            #other_yaws = np.stack([npu.fill_axis_to_size(
+            #    k(_, 'agent_yaws')[:self.Other_count], axis=0, size=self.Other_count) for _ in data], 1)
 
             # (A, B, Tpast, d)
-            pasts = np.concatenate([player_pasts, other_pasts], 0)[..., -self.T_past:, :]
-            experts = np.concatenate([player_experts, other_experts], 0)
-            yaws = np.concatenate([player_yaws, other_yaws], 0)
+            pasts = np.concatenate([player_pasts, other_pasts], 1)[..., -self.T_past:, :]
+            experts = np.concatenate([player_experts, other_experts], 1)
+            yaws = np.concatenate([player_yaws, other_yaws], 1)
         else:
             # (A, B, Tpast, d)
             pasts = player_pasts[..., -self.T_past:, :]
@@ -177,11 +185,12 @@ class SerializedDataset(interface.ESPDataset, minibatched_dataset.MinibatchedDat
         agent_presence = np.zeros((self.max_A, self.B), dtype=np.float32)
         for bi, d in enumerate(data):
             if self.Other_count > 0:
-                if isinstance(k(d, 'agent_futures'), np.ndarray):
-                    size = k(d, 'agent_futures').shape[0]
-                else:
-                    size = len(k(d, 'agent_futures'))
-                agent_presence[:size + 1, bi] = 1
+                size = self.Other_count
+                #if isinstance(k(d, 'agent_futures'), np.ndarray):
+                #    size = k(d, 'agent_futures').shape[0]
+                #else:
+                #    size = len(k(d, 'agent_futures'))
+                #agent_presence[:size + 1, bi] = 1
             else:
                 agent_presence[0, bi] = 1
         if self.max_A < agent_presence.shape[0]:
@@ -198,7 +207,7 @@ class SerializedDataset(interface.ESPDataset, minibatched_dataset.MinibatchedDat
             minibatch_filenames = self._fetch_minibatch_filenames(mb_idx, split)
             bevs_sdt = get_sdt(bevs, minibatch_filenames, **self.extra_params.get_sdt_params)
             bevs = bevs_sdt
-            
+
         # Create phi.
         if input_singleton:
             return input_singleton.to_feed_dict(
