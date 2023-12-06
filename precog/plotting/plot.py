@@ -22,6 +22,11 @@ COLORS = """#377eb8
 #ff7f00
 #4daf4a
 #984ea3
+#ffd54f
+#377eb8
+#ff7f00
+#4daf4a
+#984ea3
 #ffd54f""".split('\n')
 
 def astype(x, dtype):

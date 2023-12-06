@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 
 import atexit
 import logging
@@ -13,6 +15,7 @@ import precog.utils.log_util as logu
 import precog.utils.tfutil as tfutil
 import precog.interface as interface
 import precog.plotting.plot as plot
+from matplotlib import pyplot as plt
 
 log = logging.getLogger(os.path.basename(__file__))
 
@@ -53,15 +56,29 @@ def main(cfg):
     count = 0
     while True:
         minibatch = dataset.get_minibatch(split=cfg.split, input_singleton=inference.training_input, is_training=False)
+
         if not cfg.main.compute_metrics:
             for t in inference.training_input.experts.tensors:
                 try: del minibatch[t]
                 except KeyError: pass
         if minibatch is None: break
+
         sessrun = functools.partial(sess.run, feed_dict=minibatch)
         try:
             # Run sampling and convert to numpy.
             sampled_output_np = inference.sampled_output.to_numpy(sessrun)
+
+            '''image = sampled_output_np.phi.overhead_features[0]
+
+            # If you want to display the first three channels (assuming RGB format), discard the fourth channel
+            image_rgb = image[:, :, :3]
+
+            # Display the image using Matplotlib
+            plt.imshow(image_rgb)
+            plt.axis('off')  # Turn off axis labels and ticks
+            plt.title('Image')
+            plt.show()'''
+
             if cfg.main.compute_metrics:
                 # Get experts in numpy version.
                 experts_np = inference.training_input.experts.to_numpy(sessrun)
@@ -76,7 +93,7 @@ def main(cfg):
             raise v
         if cfg.main.plot:
             log.info("Plotting...")
-            for b in range(10):
+            for b in range(dataset.B):
                 im = plot.plot_sample(sampled_output_np,
                                       experts_np,
                                       b=b,

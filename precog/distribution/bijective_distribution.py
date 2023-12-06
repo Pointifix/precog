@@ -102,6 +102,7 @@ class ESPBijectiveDistribution(interface.ESPDistribution):
         Z = tf.identity(self.base.sample(sample_shape=(outer, inner, self.A, T)), name='Z_sample')
         # Warp the base space samples forward (expensive).
         roll = self.bijection.forward(Z, phi)
+
         # Compute the output-space probability (cheap). 
         log_prob, _ = self._log_prob_roll(roll)
         # Record the rollout, the inputs, and the rollout's prob. This prob is important because we'll use it for DIM planning in Z-space.

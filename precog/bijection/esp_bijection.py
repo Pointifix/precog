@@ -6,6 +6,7 @@ import tensorflow as tf
 
 import precog.interface as interface
 import precog.utils.tensor_util as tensoru
+import traceback
 
 log = logging.getLogger(__file__)
 
@@ -65,6 +66,28 @@ class ESPJointTrajectoryBijectionMixin:
                 S_t = mu_t + tf.einsum('...ij,...j->...i', sigma_t,  Z_t)
                 phi.update_frames(S_t_car_frames=S_t, S_tm1_car_frames=S_history[-1])
 
+                # ------------------------------------------------------------------------------------------------------
+                # Added by Simon Pointner, masking by agent_presence
+
+                '''expanded_tensor = tf.expand_dims(phi.agent_presence, axis=1)
+                expanded_tensor = tf.tile(expanded_tensor, [1, 12, 1])
+                expanded_tensor = tf.expand_dims(expanded_tensor, axis=3)
+                expanded_tensor = tf.tile(expanded_tensor, [1, 1, 1, 2])
+                expanded_tensor = tf.reshape(expanded_tensor, (1, 12, 10, 2))
+
+                # expanded_tensor2 = tf.expand_dims(expanded_tensor, axis=4)
+                # expanded_tensor2 = tf.tile(expanded_tensor2, [1, 1, 1, 1, 2])
+                # expanded_tensor2 = tf.reshape(expanded_tensor2, (1, 12, 10, 2, 2))
+
+                m_t = tf.math.multiply(m_t, expanded_tensor)
+                mu_t = tf.math.multiply(mu_t, expanded_tensor)
+                sigel_t = tf.math.multiply(sigel_t, expanded_tensor2)
+                sigma_t = tf.math.multiply(sigma_t, expanded_tensor2)
+                S_t = tf.math.multiply(S_t, expanded_tensor)
+                Z_t = tf.math.multiply(Z_t, expanded_tensor)'''
+
+                # -------------------------------------------------------------------------------------------------------
+
                 m_history.append(m_t)
                 mu_history.append(mu_t)
                 sigel_history.append(sigel_t)
@@ -74,7 +97,7 @@ class ESPJointTrajectoryBijectionMixin:
                 metadata_history.append(self.current_metadata)
 
                 if getattr(self, 'debug_eager', False): pdb.set_trace()
-                
+
         roll = interface.ESPRollout(
             S_car_frames_list=S_history[2:],
             Z_list=Z_history,
@@ -132,7 +155,29 @@ class ESPJointTrajectoryBijectionMixin:
             sigma_t_inv = tf.linalg.expm(-1 * sigel_t)
             Z_t = tf.einsum('...ij,...j->...i', sigma_t_inv, S_t - mu_t)
             phi.update_frames(S_t_car_frames=S_t, S_tm1_car_frames=S_history[-1])
-            
+
+            # ----------------------------------------------------------------------------------------------------------
+            # Added by Simon Pointner, masking by agent_presence
+
+            '''expanded_tensor = tf.expand_dims(phi.agent_presence, axis=1)
+            expanded_tensor = tf.tile(expanded_tensor, [1, 12, 1])
+            expanded_tensor = tf.expand_dims(expanded_tensor, axis=3)
+            expanded_tensor = tf.tile(expanded_tensor, [1, 1, 1, 2])
+            expanded_tensor = tf.reshape(expanded_tensor, (1, 12, 10, 2))
+
+            #expanded_tensor2 = tf.expand_dims(expanded_tensor, axis=4)
+            #expanded_tensor2 = tf.tile(expanded_tensor2, [1, 1, 1, 1, 2])
+            #expanded_tensor2 = tf.reshape(expanded_tensor2, (1, 12, 10, 2, 2))
+
+            m_t = tf.math.multiply(m_t, expanded_tensor)
+            mu_t = tf.math.multiply(mu_t, expanded_tensor)
+            sigel_t = tf.math.multiply(sigel_t, expanded_tensor2)
+            sigma_t = tf.math.multiply(sigma_t, expanded_tensor2)
+            S_t = tf.math.multiply(S_t, expanded_tensor)
+            Z_t = tf.math.multiply(Z_t, expanded_tensor)'''
+
+            # ----------------------------------------------------------------------------------------------------------
+
             m_history.append(m_t)
             mu_history.append(mu_t)
             sigel_history.append(sigel_t)
@@ -140,7 +185,24 @@ class ESPJointTrajectoryBijectionMixin:
             S_history.append(S_t)
             Z_history.append(Z_t)
             metadata_history.append(self.current_metadata)
-            
+
+        # --------------------------------------------------------------------------------------------------------------
+        # Added by Simon Pointner, masking by agent_presence
+
+        '''expanded_tensor = tf.expand_dims(phi.agent_presence, axis=1)
+        expanded_tensor = tf.tile(expanded_tensor, [1, 12, 1])
+        expanded_tensor = tf.expand_dims(expanded_tensor, axis=3)
+        expanded_tensor = tf.tile(expanded_tensor, [1, 1, 1, 2])
+        expanded_tensor = tf.reshape(expanded_tensor, (1, 12, 10, 2))
+
+        m_t = tf.math.multiply(m_t, expanded_tensor)
+
+        expanded_tensor = tf.expand_dims(expanded_tensor, axis=4)
+        expanded_tensor = tf.tile(expanded_tensor, [1, 1, 1, 1, 2])
+        expanded_tensor = tf.reshape(expanded_tensor, (1, 12, 10, 2, 2))'''
+
+        # --------------------------------------------------------------------------------------------------------------
+
         roll = interface.ESPRollout(
             S_car_frames_list=S_history[2:],
             Z_list=Z_history,

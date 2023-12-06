@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 
 import atexit
 import hydra

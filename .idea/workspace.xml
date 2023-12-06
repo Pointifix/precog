@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="13f9cf4c-6f4d-4e13-a6a7-16dc46ce6af6" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/precog/conf/dataset/carla_town01_A10_T20_v2.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/bijection/esp_bijection.py" beforeDir="false" afterPath="$PROJECT_DIR$/precog/bijection/esp_bijection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/bijection/social_convrnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/precog/bijection/social_convrnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/conf/dataset/carla_town01_A1_T20_v2.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/precog/conf/dataset/carla_town01_A1_T20_v2.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/conf/esp_infer_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/precog/conf/esp_infer_config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/conf/esp_train_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/precog/conf/esp_train_config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/conf/hardware/shared_gpu.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/precog/conf/hardware/shared_gpu.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/conf/optimizer/sgd_optimizer.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/precog/conf/optimizer/sgd_optimizer.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/dataset/serialized_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/precog/dataset/serialized_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/distribution/bijective_distribution.py" beforeDir="false" afterPath="$PROJECT_DIR$/precog/distribution/bijective_distribution.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/esp_infer.py" beforeDir="false" afterPath="$PROJECT_DIR$/precog/esp_infer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/esp_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/precog/esp_train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/precog/interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/plotting/plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/precog/plotting/plot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog/utils/similarity_util.py" beforeDir="false" afterPath="$PROJECT_DIR$/precog/utils/similarity_util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/precog_env.sh" beforeDir="false" afterPath="$PROJECT_DIR$/precog_env.sh" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2VtLfd7N8gkUF98N7EdIEmNYk18" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/simon/Repositories/precog/precog_env.sh&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/precog/conf/dataset" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.esp_train">
+    <configuration name="infer" type="CompoundRunConfigurationType">
+      <toRun name="esp_infer" type="PythonConfigurationType" />
+      <toRun name="env" type="ShConfigurationType" />
+      <method v="2" />
+    </configuration>
+    <configuration name="esp_infer" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="precog" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="pre3" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/precog" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/precog/esp_infer.py" />
+      <option name="PARAMETERS" value="dataset=carla_town01_A10_T20_v2" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="esp_train" type="PythonConfigurationType" factoryName="Python">
+      <module name="precog" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="pre3" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/precog" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/precog/esp_train.py" />
+      <option name="PARAMETERS" value="dataset=carla_town01_A10_T20_v2 main.eager=False bijection.params.A=3 optimizer.params.plot_before_train=True optimizer.params.save_before_train=True" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="env" type="ShConfigurationType">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/precog_env.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Compound.infer" />
+      <item itemvalue="Python.esp_infer" />
+      <item itemvalue="Python.esp_train" />
+      <item itemvalue="Shell Script.env" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="13f9cf4c-6f4d-4e13-a6a7-16dc46ce6af6" name="Changes" comment="" />
+      <created>1695650534712</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1695650534712</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/precog/dataset/serialized_dataset.py</url>
+          <line>247</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="sessrun.keywords['feed_dict'][Tensor(&quot;light_strings:0&quot;, shape=(1,), dtype=string)]" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>

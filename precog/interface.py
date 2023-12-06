@@ -250,7 +250,7 @@ class ESPPhi(NumpyableTensorGroup):
                  overhead_features,
                  agent_presence,
                  feature_pixels_per_meter,
-                 is_training,
+                 is_training=True,
                  light_strings=None,
                  yaws_in_degrees=True,
                  past_perturb_epsilon=5e-2,
@@ -310,7 +310,7 @@ class ESPPhi(NumpyableTensorGroup):
         # Object to convert from local vehicle frames to world frame.        
         local2world = similarityu.SimilarityTransform.from_origin_and_rotation(
             origin=agent_origins_world_frame, theta=yaws, degrees=yaws_in_degrees, scale=1.)
-        
+
         # Object to convert from world frame to frames of each vehicle.
         world2local = local2world.invert()
 
@@ -333,7 +333,7 @@ class ESPPhi(NumpyableTensorGroup):
         if len(batch_shape) == 2: self.batch_str = 'bk'
         elif len(batch_shape) == 1: self.batch_str = 'b'
         else: raise ValueError("Unhandled batch size")
-        
+
         if len(batch_shape) == 1:            
             self.current_local2world = self.original_local2world = self.world2local.invert()
             # Input spaces: Car frames. Output space: grid frame.
@@ -438,6 +438,7 @@ class ESPPhiMetadata(NumpyableTensorGroup):
         B1 = self.phi.yaws.shape[0]
         B2 = self.phi.overhead_features.shape[0]
         B3 = self.phi.agent_presence.shape[0]
+
         assert(B0 == B1 == B2 == B3)
         self.B = B0.value
         self.H = tensoru.size(self.phi.overhead_features, 1)
@@ -506,7 +507,6 @@ class ESPTrainingInput(NumpyableTensorGroupGroup):
                   is_training,
                   metadata_list=None,
                   name=False):
-
         # These objects convert most of their inputs to tensors.
         phi = ESPPhi(
             S_past_world_frame,

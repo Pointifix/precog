@@ -77,6 +77,7 @@ class SimilarityTransform:
             else: points_Rt = points_R + self._ts[points_ein]
         else:
             points_Rt = points_R
+        #points_Rt = points_R
 
         if dtype == self.lib.int32: return self.lib.cast(self.lib.round(points_Rt), self.lib.int32)
         else: return points_Rt

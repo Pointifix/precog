@@ -6,6 +6,9 @@ import glob
 import logging
 import numpy as np
 import os
+import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize
+from matplotlib.cm import ScalarMappable
 import pdb
 
 import precog.interface as interface
@@ -18,7 +21,7 @@ import precog.utils.log_util as logu
 log = logging.getLogger(os.path.basename(__file__))
 
 class SerializedDataset(interface.ESPDataset, minibatched_dataset.MinibatchedDataset):
-    input_keys = ['player_future', 'agent_futures', 'player_past', 'agent_pasts', 'player_yaw', 'agent_yaws', "overhead_features"]
+    input_keys = ['player_future', 'player_past', 'player_yaw', "overhead_features"]
     
     @logu.log_wrapi()
     @classu.member_initialize
@@ -46,18 +49,20 @@ class SerializedDataset(interface.ESPDataset, minibatched_dataset.MinibatchedDat
         val_path = root_path + val_suffix
         test_path = root_path + test_suffix
         assert(fmt in ('json', 'dill'))
-        match_str = '/{}{}'.format(match_prefix, fmt)
+        match_str = '/**/{}{}'.format(match_prefix, fmt)
         self._rng = np.random.default_rng()
 
         log.debug("Indexing split filenames")
-        self._train_data = np.asarray(sorted(glob.glob(train_path + match_str)))[:max_data]
-        self._val_data = np.asarray(sorted(glob.glob(val_path + match_str)))[:max_data]
-        self._test_data = np.asarray(sorted(glob.glob(test_path + match_str)))[:max_data]
+        self._train_data = np.asarray(sorted(glob.glob(train_path + match_str, recursive=True)))[:max_data]
+        self._val_data = np.asarray(sorted(glob.glob(val_path + match_str, recursive=True)))[:max_data]
+        self._test_data = np.asarray(sorted(glob.glob(test_path + match_str, recursive=True)))[:max_data]
             
         self.Other_count = self.max_A - 1
         self.Other_count_past = self.Other_count
         log.debug("Indexing split statistics")
         self._index_minibatches()
+
+        print("training on ", self._n_train, " entries")
 
         # Possible shuffle the splits.
         log.debug("Shuffling splits")
@@ -108,45 +113,96 @@ class SerializedDataset(interface.ESPDataset, minibatched_dataset.MinibatchedDat
         k = lambda _, _k: getattr(_, self.keyremap[_k])
 
         data = self._fetch_minibatch(mb_idx, split)
-        
+
+        presence = np.stack([np.asarray(k(_, 'agent_presence')) for _ in data], 1)
+
         # (1, B, T, d)
-        player_experts = np.stack([np.asarray(k(_, 'player_future')) for _ in data], 0)[None]
+        futures = np.stack([np.asarray(k(_, 'player_future')) for _ in data], 1)
+        player_experts = futures[:, [0], :, :]
 
         # (1, B, Tp, d)
-        player_pasts = np.stack([np.asarray(k(_, 'player_past')) for _ in data], 0)[None]
-        
+        pasts = np.stack([np.asarray(k(_, 'player_past')) for _ in data], 1)
+        player_pasts = pasts[:, [0], :, :]
+
         # (1, B)
-        player_yaws = np.stack([k(_, 'player_yaw') for _ in data], 0)[None]
+        yaws = np.stack([k(_, 'player_yaw') for _ in data], 1)
+        player_yaws = yaws[:, [0]]
 
         # (O, B, T, d)
         if self.Other_count > 0:
-            other_experts = np.stack([npu.fill_axis_to_size(
-                np.asarray(k(_, 'agent_futures'))[:self.Other_count], axis=0, size=self.Other_count) for _ in data], 1)
+            other_experts = futures[:, 1:, :, :]
+
+            # other_experts = np.stack([npu.fill_axis_to_size(
+            #    np.asarray(k(_, 'agent_futures'))[:self.Other_count], axis=0, size=self.Other_count) for _ in data], 1)
             # (O, B, Tp, d)
-            other_pasts = np.stack([npu.fill_axis_to_size(
-                np.asarray(k(_, 'agent_pasts'))[:self.Other_count], axis=0, size=self.Other_count_past) for _ in data], 1)
-                
+            other_pasts = pasts[:, 1:, :, :]
+            # other_pasts = np.stack([npu.fill_axis_to_size(
+            #    np.asarray(k(_, 'agent_pasts'))[:self.Other_count], axis=0, size=self.Other_count_past) for _ in data], 1)
+
             # (O, B)
-            other_yaws = np.stack([npu.fill_axis_to_size(
-                k(_, 'agent_yaws')[:self.Other_count], axis=0, size=self.Other_count) for _ in data], 1)
+            other_yaws = yaws[:, 1:]
+            # other_yaws = np.stack([npu.fill_axis_to_size(
+            #    k(_, 'agent_yaws')[:self.Other_count], axis=0, size=self.Other_count) for _ in data], 1)
 
             # (A, B, Tpast, d)
-            pasts = np.concatenate([player_pasts, other_pasts], 0)[..., -self.T_past:, :]
-            experts = np.concatenate([player_experts, other_experts], 0)
-            yaws = np.concatenate([player_yaws, other_yaws], 0)
+            pasts = np.concatenate([player_pasts, other_pasts], 1)[..., -self.T_past:, :]
+            experts = np.concatenate([player_experts, other_experts], 1)
+            yaws = np.concatenate([player_yaws, other_yaws], 1)
+
+            '''
+            # Calculate distances from the origin for the last point in the past trajectory
+            last_point_distances = np.linalg.norm(pasts[:, :, -1], axis=-1)
+
+            # Calculate distances from the origin for the first point in the future trajectory
+            first_point_distances = np.linalg.norm(experts[:, :, 0], axis=-1)
+
+            # Get the indices that would sort the arrays based on the distances
+            sorted_indices_past = np.argsort(last_point_distances.flatten())
+            sorted_indices_future = np.argsort(first_point_distances.flatten())
+
+            # Sort both arrays based on the calculated indices
+            pasts = pasts[sorted_indices_past]
+            yaws = yaws[sorted_indices_past]
+            experts = experts[sorted_indices_future]
+
+            def plot_trajectories(arr, arr2, title):
+                num_trajectories = arr.shape[0]
+                norm = Normalize(vmin=0, vmax=arr.shape[0] - 1)
+                sm = ScalarMappable(cmap='viridis', norm=norm)
+                for i in range(num_trajectories):
+                    color = sm.to_rgba(i)
+                    plt.plot(arr[i, 0, :, 0], arr[i, 0, :, 1], marker='o', color=color,
+                             label=f'Trajectory {i + 1}')  # assuming x, y values are in last dimension
+                    plt.plot(arr2[i, 0, :, 0], arr2[i, 0, :, 1], marker='x', color=color,
+                             label=f'Trajectory {i + 1}')  # assuming x, y values are in last dimension
+                plt.colorbar(sm, label='Index of Trajectory')
+                plt.title(title)
+                plt.xlabel('X-axis')
+                plt.ylabel('Y-axis')
+                plt.legend()
+                plt.grid(True)
+                plt.xlim(-25, 25)
+                plt.ylim(-25, 25)
+                plt.show()
+
+            #print("test1")
+            #plot_trajectories(pasts, experts, "SORTED")
+
+            #print("test2")
+            #plot_trajectories(sorted_past_trajectory, sorted_future_trajectory, "SORTED")'''
         else:
             # (A, B, Tpast, d)
             pasts = player_pasts[..., -self.T_past:, :]
             experts = player_experts
             yaws = player_yaws
-            
+
         # (O, B)
         # scene_tokens = np.asarray([_.metadata['scene_token'] for _ in data])
         # agent_annotation_tokens = np.stack([npu.fill_axis_to_size(
         #     _.metadata['agent_annotation_tokens'][:self.Other_count], axis=0, size=self.Other_count) for _ in data], 1)
 
         metadata_list = metadata_producers.PRODUCERS[self._name + '_' + self.fmt](data)
-        
+
         # TODO
         up = lambda x: x.upper() if x else x
         try:
@@ -174,16 +230,16 @@ class SerializedDataset(interface.ESPDataset, minibatched_dataset.MinibatchedDat
         else: pass
         
         # (A, B)
-        agent_presence = np.zeros((self.max_A, self.B), dtype=np.float32)
+        #agent_presence = np.zeros((self.max_A, self.B), dtype=np.float32)
+        agent_presence = presence
         for bi, d in enumerate(data):
             if self.Other_count > 0:
-                if isinstance(k(d, 'agent_futures'), np.ndarray):
-                    size = k(d, 'agent_futures').shape[0]
-                else:
-                    size = len(k(d, 'agent_futures'))
-                agent_presence[:size + 1, bi] = 1
-            else:
-                agent_presence[0, bi] = 1
+                size = self.Other_count
+                #if isinstance(k(d, 'agent_futures'), np.ndarray):
+                #    size = k(d, 'agent_futures').shape[0]
+                #else:
+                #    size = len(k(d, 'agent_futures'))
+                #agent_presence[:size + 1, bi] = 1
         if self.max_A < agent_presence.shape[0]:
             log.warning("Max A is less than possible A: {} < {}".format(self.max_A, agent_presence.shape[0]))
         agent_presence[self.max_A:] = 0
@@ -198,7 +254,7 @@ class SerializedDataset(interface.ESPDataset, minibatched_dataset.MinibatchedDat
             minibatch_filenames = self._fetch_minibatch_filenames(mb_idx, split)
             bevs_sdt = get_sdt(bevs, minibatch_filenames, **self.extra_params.get_sdt_params)
             bevs = bevs_sdt
-            
+
         # Create phi.
         if input_singleton:
             return input_singleton.to_feed_dict(

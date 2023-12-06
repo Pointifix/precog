@@ -3,4 +3,7 @@ CURDIR=$(pwd)
 
 # Enable importing from source package.
 export PYTHONPATH=$PRECOGROOT:$PYTHONPATH;
+
+echo $PYTHONPATH
+
 export PATH=$PRECOGROOT/scripts:$PATH

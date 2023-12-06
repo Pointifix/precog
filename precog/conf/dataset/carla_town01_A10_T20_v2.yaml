@@ -1,8 +1,9 @@
 dataset:
   class: precog.dataset.serialized_dataset.SerializedDataset
   params:
-    root_path: /home/simon/Repositories/deep_imitative_models/dim_release_results/2023-09/09-11-19-25-15/episode_000000/dim_feeds
-    _max_A: 1
+    #root_path: /home/simon/Repositories/deep_imitative_models/dim_release_results/2023-09/09-13-15-33-29
+    root_path: /home/simon/Repositories/deep_imitative_models/dim_release_results/2023-12/12-04-15-44-26
+    _max_A: 3
     B: 1
     T: 20
     T_past: 3
@@ -20,6 +21,7 @@ dataset:
       player_past: 'S_past_world_frame'
       overhead_features: 'overhead_features'
       player_yaw: 'yaws'
+      agent_presence: 'agent_presence'
     extra_params:
       allow_horizon_mismatch: False
       get_sdt_params:

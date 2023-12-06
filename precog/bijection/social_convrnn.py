@@ -291,7 +291,6 @@ class SocialConvRNN(esp_bijection.ESPJointTrajectoryBijectionMixin, interface.ES
             for a in range(self.A):
                 # Note we're summing here instead of concatenating.
                 others_feat = tf.reduce_sum(map_feats_list[:a] + map_feats_list[a+1:], axis=0)
-
                 # Create a feature for each agent that depends on its own map feat and the sum of the other agent's map feats.
                 social_map_feats.append(tf.concat((map_feats_list[a], others_feat), axis=-1))
         else:
@@ -350,6 +349,20 @@ class SocialConvRNN(esp_bijection.ESPJointTrajectoryBijectionMixin, interface.ES
         # Pass the RNN outputs to the MLP. (batch_size, 6)
         predictions = tensoru.mlp(self.mlp, output)
 
+        # -------------------------------------------------------------------------------------------------------------
+        # Simon Pointner
+
+        '''mask = tf.tile(self.current_phi.agent_presence, [1, 12])
+        mask = tf.transpose(mask)
+        mask = tf.tile(mask, [1, 6])
+
+        print(predictions)
+
+        #print(mask)
+
+        predictions = tf.math.multiply(predictions, mask)'''
+
+        # -------------------------------------------------------------------------------------------------------------
 
         # Build final outputs.
         m_t = tf.reshape(predictions[:, :self.D], self.mu_shape)
